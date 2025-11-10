@@ -22,6 +22,8 @@ struct SettingsView: View {
         case promptInterpretation
         case promptMultipleResourceInterpretation
         case downloadLocalLLM
+        case ragflowSettings
+        case spineSurgeryRecommendations
     }
     
     @State private var path = NavigationPath()
@@ -37,6 +39,7 @@ struct SettingsView: View {
         NavigationStack(path: $path) {
             List {
                 openAISettings
+                ragSettings
                 speechSettings
                 resourcesLimitSettings
                 resourcesSettings
@@ -95,6 +98,17 @@ struct SettingsView: View {
             }
             NavigationLink(value: SettingsDestinations.openAIModelParameters) {
                 Text("SETTINGS_OPENAI_MODEL_PARAMETERS")
+            }
+        }
+    }
+    
+    private var ragSettings: some View {
+        Section("RAG Enhancement") {
+            NavigationLink(value: SettingsDestinations.ragflowSettings) {
+                Label("RAGFlow Configuration", systemImage: "server.rack")
+            }
+            NavigationLink(value: SettingsDestinations.spineSurgeryRecommendations) {
+                Label("Spine Surgery Recommendations", systemImage: "waveform.path.ecg")
             }
         }
     }
@@ -166,6 +180,10 @@ struct SettingsView: View {
                 path.removeLast()
             }
                 .interactiveDismissDisabled()
+        case .ragflowSettings:
+            RAGFlowSettingsView()
+        case .spineSurgeryRecommendations:
+            SpineSurgeryRecommendationView()
         }
     }
 }

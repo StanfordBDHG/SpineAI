@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # RAGFlow service for document retrieval and RAG functionality
+  ragflow:
+    image: infiniflow/ragflow:v0.21.1-slim
+    container_name: spineai-ragflow
+    ports:
+      - "8080:80"  # RAGFlow web interface and API
+    environment:
+      - RAGFLOW_HOST=0.0.0.0
+      - RAGFLOW_PORT=80
+      - DOC_ENGINE=elasticsearch
+      - MYSQL_PASSWORD=ragflow_password
+      - MINIO_PASSWORD=ragflow_password
+    volumes:
+      - ragflow_data:/ragflow
+      - ./conf:/ragflow/conf  # Configuration files
+    depends_on:
+      - elasticsearch
+      - mysql
+      - minio
+      - redis
+    networks:
+      - spineai-network
+    restart: unless-stopped
+
+  # Elasticsearch for document storage and search
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    container_name: spineai-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - xpack.security.enabled=false
+      - cluster.name=spineai-ragflow
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - spineai-network
+    restart: unless-stopped
+
+  # MySQL for RAGFlow metadata
+  mysql:
+    image: mysql:8.0
+    container_name: spineai-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=ragflow_password
+      - MYSQL_DATABASE=ragflow
+      - MYSQL_USER=ragflow
+      - MYSQL_PASSWORD=ragflow_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - spineai-network
+    restart: unless-stopped
+
+  # MinIO for object storage
+  minio:
+    image: minio/minio:latest
+    container_name: spineai-minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=ragflow
+      - MINIO_ROOT_PASSWORD=ragflow_password
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - spineai-network
+    restart: unless-stopped
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: spineai-redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6380:6379"  # Changed to 6380 to avoid conflict
+    networks:
+      - spineai-network
+    restart: unless-stopped
+
+  # API Proxy for iOS app to communicate with RAGFlow
+  spineai-proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: spineai-proxy
+    ports:
+      - "5001:5000"  # Changed to 5001 to avoid conflict
+    environment:
+      - RAGFLOW_API_URL=http://ragflow:80/api
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PROXY_SECRET_KEY=${PROXY_SECRET_KEY:-spineai_secret_key_change_in_production}
+    depends_on:
+      - ragflow
+    networks:
+      - spineai-network
+    restart: unless-stopped
+
+networks:
+  spineai-network:
+    driver: bridge
+
+volumes:
+  ragflow_data:
+  es_data:
+  mysql_data:
+  minio_data:
+  redis_data:
+

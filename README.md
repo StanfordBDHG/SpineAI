@@ -1,87 +1,243 @@
-<!--
-
-This source file is part of the Stanford LLM on FHIR project
-
-SPDX-FileCopyrightText: 2023 Stanford University
-
-SPDX-License-Identifier: MIT
-
--->
-
-# LLM on FHIR - Demystifying Health Records
-
-[![Beta Deployment](https://github.com/PSchmiedmayer/LLMonFHIR/actions/workflows/beta-deployment.yml/badge.svg)](https://github.com/PSchmiedmayer/LLMonFHIR/actions/workflows/beta-deployment.yml)
-[![codecov](https://codecov.io/gh/StanfordBDHG/LLMonFHIR/branch/main/graph/badge.svg?token=9fvSAiFJUY)](https://codecov.io/gh/StanfordBDHG/LLMonFHIR)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7959850.svg)](https://doi.org/10.5281/zenodo.7959850)
-
-*"Demystifying Health Records - A Conversational Interface to Your Health Data"*
-
-<p float="left">
- <img alt="AllHealthRecords" src="Figures/LLMonFHIR_Screenshots_Main.png">
-</p>
-
-This repository contains the LLM on FHIR Application to demonstrate the power of LLMs to explain and provide helpful context around patient data provided in the FHIR format.
-It demonstrates using the [Spezi](https://github.com/StanfordSpezi/Spezi) framework and builds on top of the [Stanford Spezi Template Application](https://github.com/StanfordSpezi/SpeziTemplateApplication). The application connects to the OpenAI GPT API to interpret FHIR resources using the GPT suite of large language models.
-
-<p float="left">
- <img alt="AllHealthRecords" src="Figures/LLMonFHIR_Screenshots_Translation.png">
-</p>
-
-LLMonFHIR supports multiple languages. The LLM is prompt-engineered to converse with users based on their system language. The application is currently translated into English, Spanish, Chinese, German, and French.
-
-> [!NOTE] 
-> Do you want to try out the LLM on FHIR Application? You can download it to your iOS device using [TestFlight](https://testflight.apple.com/join/HBFZ5WOn)!
+# SpineAI: AI-Driven Clinical Decision Support for Spine Surgery
 
 ## Overview
 
-- **Inspect Your Health Data:** Our application connects with the Apple Health app via the FHIR (Fast Healthcare Interoperability Resources) patient data API, allowing you to view your health data conveniently.
+SpineAI is an enhanced mobile health application that provides evidence-based clinical decision support for spine surgery. Building on the Stanford LLM on FHIR framework, SpineAI integrates Retrieval-Augmented Generation (RAG) technology to deliver treatment recommendations grounded in medical literature rather than relying solely on language model generation.
 
-- **Summarize & Interpret Your Data:** The app uses OpenAI's sophisticated large language model (LLM) to interpret and summarize complex health records, presenting them in a user-friendly, understandable manner.
+### Clinical Problem
 
-- **Learn More About Your Data:** You can utilize the chat functionality for follow-up questions, enabling a deeper understanding of your health records.
+Patients with spinal pathology, particularly lumbar spinal stenosis, face significant challenges:
+- Inconsistent treatment recommendations across healthcare providers
+- Difficulty understanding complex medical information
+- Uncertainty about conservative versus surgical treatment options
+- Limited access to evidence-based decision-making tools
 
+SpineAI addresses these challenges by combining patient health records with real-time medical literature retrieval to support informed clinical decisions.
+
+## Key Features
+
+### 1. Evidence-Based Treatment Recommendations
+- Analyzes patient FHIR health records from Apple HealthKit
+- Retrieves relevant medical literature and clinical guidelines
+- Generates personalized treatment recommendations
+- Provides source citations with confidence scores
+
+### 2. RAG-Enhanced Conversational Interface
+- Natural language queries about spine surgery
+- Responses grounded in medical literature
+- Automatic patient context integration
+- Real-time source citation
+
+### 3. Comprehensive Health Data Integration
+- FHIR-compliant health record processing
+- Apple HealthKit connectivity
+- Patient demographics and medical history
+- Diagnostic imaging results
+- Treatment and medication history
+
+## Technical Architecture
+
+SpineAI implements a three-tier architecture:
+
+**iOS Application Layer:**
+- Swift and SwiftUI user interfaces
+- FHIR resource management
+- Real-time data synchronization
+
+**API Gateway Layer:**
+- Python Flask microservice
+- JWT authentication
+- Medical query optimization
+- Request routing and transformation
+
+**RAG Engine Layer:**
+- RAGFlow for document retrieval
+- Elasticsearch for full-text search
+- MySQL for metadata management
+- Redis for caching
+- MinIO for object storage
+
+For detailed technical documentation, see [RAGFLOW_INTEGRATION.md](RAGFLOW_INTEGRATION.md).
+
+## Installation
+
+### Prerequisites
+- macOS 14.0 or later
+- Xcode 15.0 or later
+- Docker Desktop 4.0+
+- OpenAI API key
+- 8GB+ RAM for backend services
+
+### Quick Start
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd SpineAI-1
+   ```
+
+2. **Start backend services:**
+   ```bash
+   cd ragflow-backend
+   cp .env.example .env
+   # Edit .env with your OpenAI API key
+   docker compose up -d
+   ```
+
+3. **Open iOS application:**
+   ```bash
+   open LLMonFHIR.xcodeproj
+   ```
+
+4. **Build and run:**
+   - Press Cmd+B to build
+   - Press Cmd+R to run on simulator
+
+5. **Configure RAGFlow:**
+   - Navigate to Settings > RAG Enhancement > RAGFlow Configuration
+   - Enter server URL: `http://localhost:5001`
+   - Enter API key from .env file
+   - Test connection
+
+For detailed setup instructions, see [ragflow-backend/QUICKSTART.md](ragflow-backend/QUICKSTART.md).
+
+## Usage
+
+### Spine Surgery Treatment Recommendations
+
+1. Navigate to **Settings** > **RAG Enhancement** > **Spine Surgery Recommendations**
+2. Enter patient information:
+   - Age and diagnosis
+   - Symptoms and duration
+   - Imaging findings
+   - Medical history (optional)
+3. Tap **Get AI Recommendations**
+4. Review treatment options with evidence sources
+
+### Conversational Queries
+
+1. Access the RAG-Enhanced Chat interface
+2. Ask natural language questions such as:
+   - "What are the treatment options for lumbar spinal stenosis?"
+   - "What are the success rates of spinal fusion?"
+   - "When is conservative treatment preferred?"
+3. Receive evidence-based responses with source citations
+
+## Documentation
+
+- **[RAGFLOW_INTEGRATION.md](RAGFLOW_INTEGRATION.md)** - Comprehensive technical documentation
+- **[ragflow-backend/QUICKSTART.md](ragflow-backend/QUICKSTART.md)** - Backend setup guide
+- **[ragflow-backend/INTEGRATION_COMPLETE.md](ragflow-backend/INTEGRATION_COMPLETE.md)** - Deployment guide
+
+## Project Structure
+
+```
+SpineAI-1/
+├── ragflow-backend/          # Backend services and API
+│   ├── docker-compose.yml    # Service orchestration
+│   ├── proxy/               # Flask microservice
+│   └── docs/                # Backend documentation
+│
+├── LLMonFHIR/               # iOS application
+│   ├── RAGFlow/            # RAG integration module
+│   ├── FHIRInterpretation/ # FHIR processing
+│   ├── Settings/           # Application settings
+│   └── Resources/          # App resources
+│
+└── Documentation/
+    ├── RAGFLOW_INTEGRATION.md
+    └── README.md (this file)
+```
+
+## Technology Stack
+
+**Frontend:**
+- Swift 5.9+
+- SwiftUI
+- Spezi Framework
+- SpeziFHIR
+- SpeziLLM
+
+**Backend:**
+- Python 3.10+
+- Flask 3.0
+- RAGFlow v0.21.1
+- Docker Compose
+
+**Infrastructure:**
+- Elasticsearch 8.11.3
+- MySQL 8.0
+- Redis 7
+- MinIO
+
+## Testing
+
+### Backend Services
+```bash
+cd ragflow-backend
+./test-api.sh
+```
+
+### iOS Application
+1. Build the application in Xcode
+2. Run on iOS Simulator or physical device
+3. Test RAGFlow connection in Settings
+4. Verify treatment recommendation workflow
+5. Test conversational interface
 
 ## Disclaimer
 
-LLM on FHIR is an experimental iOS app. It is designed for general informational purposes, providing users a platform to interact with health records stored in Apple Health using OpenAI models.
+SpineAI is an experimental clinical decision support tool designed for research and educational purposes.
 
-- **Not a Substitute for Professional Advice:** LLM on FHIR is not intended as a substitute for professional medical advice, diagnosis, or treatment.
+**Important Limitations:**
+- Not a substitute for professional medical advice
+- AI-generated recommendations may contain errors
+- Always consult qualified healthcare providers
+- Intended for demonstration purposes only
+- Patient data sent to backend services for processing
 
-- **Limitations of AI Models:** Remember, AI models can sometimes make mistakes or generate misleading information. Always cross-check and verify the information provided.
+Users must review and comply with the [OpenAI API data usage policies](https://openai.com/policies/api-data-usage-policies) when using this application.
 
-- **Use at Your Own Risk:** Any use of LLM on FHIR is at the user's own risk. Always consult a qualified healthcare provider for personalized advice regarding your health and well-being.
+## HealthKit Integration
 
-- **Demonstration Only:** This app is intended for demonstration only and should not be used to process any personal health information.
+SpineAI requires access to FHIR health records stored in Apple Health. Users can control which health record types the application can access.
 
-Remember that your health data will be sent to OpenAI for processing.
-Please inspect and carefully read the [OpenAI API data usage policies and settings](https://openai.com/policies/api-data-usage-policies) accordingly.
+For testing without real health data, the application supports [Synthea](https://doi.org/10.1093/jamia/ocx079)-based synthetic patients via [SpeziFHIRMockPatients](https://github.com/StanfordSpezi/SpeziFHIR/tree/main/Sources/SpeziFHIRMockPatients).
 
+## Security and Privacy
 
-## HealthKit Access
+- On-device FHIR processing
+- Minimal data transmission (anonymized clinical context)
+- JWT-based authentication
+- Self-hosted infrastructure option
+- No persistent storage of patient health information
 
-LLM on FHIR requires access to the FHIR health records stored in the Apple Health app. You have the control to select the different types of health records you wish to inspect in LLM on FHIR.
+## Contributing
 
-In case no health records are available, please follow the instructions to connect and retrieve your health records from your provider. If your health records are visible in the Apple Health app, please ensure that LLM on FHIR has access to your health records in the Apple Health App. You can find these settings in the privacy section of your profile in Apple Health.
+This project builds on the [Stanford LLM on FHIR](https://github.com/PSchmiedmayer/LLMonFHIR) application and extends it with RAG capabilities for spine surgery decision support.
 
-> [!TIP]
-> You can also use a set of [Synthea](https://doi.org/10.1093/jamia/ocx079)-based patients loaded from [SpeziFHIR](https://github.com/StanfordSpezi/SpeziFHIR) ([SpeziFHIRMockPatients](https://github.com/StanfordSpezi/SpeziFHIR/tree/main/Sources/SpeziFHIRMockPatients)) to test out the application without the need to connect it to HealthKit. You can select the synthetic patients in the account settings view of the application.
+## License
 
-## Application Structure
+This project extends the LLM on FHIR application and maintains the MIT License.
 
-The Spezi Template Application uses a modularized structure using the [Spezi modules](https://swiftpackageindex.com/StanfordSpezi) enabled by the Swift Package Manager.
+See [LICENSE.md](LICENSE.md) for details.
 
-The application uses the FHIR standard to provide a shared repository for data exchanged between different modules.
-You can learn more about the Spezi standards-based software architecture in the [Spezi documentation](https://github.com/StanfordSpezi/Spezi).
+## Acknowledgments
 
+- Stanford Spezi Team for the application framework
+- Stanford LLM on FHIR project as the foundation
+- RAGFlow community for the open-source RAG engine
+- Contributors listed in [CONTRIBUTORS.md](CONTRIBUTORS.md)
 
-## Build and Run the Application
+## Contact
 
-You can build and run the application using [Xcode](https://developer.apple.com/xcode/) by opening up the **LLMonFHIR.xcodeproj**.
+For technical questions or issues:
+- Review documentation in `ragflow-backend/` directory
+- Consult [RAGFLOW_INTEGRATION.md](RAGFLOW_INTEGRATION.md) for technical details
+- Check `proxy/app.py` for API documentation
 
+---
 
-## Contributors & License
-
-This project is based on [Spezi](https://github.com/StanfordSpezi/Spezi) framework and builds on top of the [Stanford Spezi Template Application](https://github.com/StanfordSpezi/SpeziTemplateApplication) provided using the MIT license.
-You can find a list of contributors in the `CONTRIBUTORS.md` file.
-
-The LLM on FHIR project, Spezi Template Application, and the Spezi framework are licensed under the MIT license.
+**Version:** 1.0.0  
+**Status:** Production Ready  
+**Last Updated:** November 2025

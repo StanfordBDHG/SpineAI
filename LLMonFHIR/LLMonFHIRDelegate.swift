@@ -33,6 +33,7 @@ class LLMonFHIRDelegate: SpeziAppDelegate {
                 )
             }
             FHIRInterpretationModule()
+            RAGFlowModule()  // RAG enhancement for evidence-based recommendations
             AccessGuardModule {
                 FixedAccessGuard(
                     .userStudyIdentifier,

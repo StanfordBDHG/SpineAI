@@ -78,4 +78,14 @@ enum StorageKeys {
     static let openAIModel = "settings.openAIModel.multipleResourceInterpretation"
     /// Model temperature
     static let openAIModelTemperature = "settings.openAIModel.temperature"
+    
+    // MARK: - RAGFlow
+    /// RAGFlow base URL
+    static let ragflowBaseURL = "ragflow_base_url"
+    /// RAGFlow API key
+    static let ragflowAPIKey = "ragflow_api_key"
+    /// RAGFlow enabled state
+    static let ragflowEnabled = "ragflow_enabled"
+    /// RAGFlow auth token
+    static let ragflowAuthToken = "ragflow_auth_token"
 }
