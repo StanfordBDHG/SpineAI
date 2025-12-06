@@ -1,0 +1,423 @@
+# SpineAI RAG Integration Setup Guide
+
+This guide provides complete instructions for setting up the SpineAI system with RAGFlow integration for clinical spine imaging guidance.
+
+## 🎯 System Overview
+
+SpineAI integrates RAGFlow (an open-source RAG engine) with the LLMonFHIR iOS app to provide evidence-based spine imaging recommendations from clinical guidelines.
+
+**Architecture:**
+```
+iOS App (LLMonFHIR)
+    ↓ HTTP Request
+Flask Proxy (localhost:8000)
+    ↓ RAGFlow API
+RAGFlow (localhost:80)
+    ↓ Vector Search
+Elasticsearch (localhost:9200)
+```
+
+## 📋 Prerequisites
+
+- **macOS** (tested on macOS Sonoma 14.5)
+- **Docker Desktop** >= 24.0.0
+- **Docker Compose** >= v2.26.1
+- **Xcode** >= 15.0
+- **Python** >= 3.10
+- **RAM** >= 16 GB
+- **Disk Space** >= 50 GB
+
+## 🚀 Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone <your-repo-url>
+cd spineai-demo
+```
+
+### 2. Set Up RAGFlow
+
+#### Start Docker Desktop
+
+```bash
+open -a Docker
+```
+
+Wait for Docker to fully start (check the whale icon in menu bar).
+
+#### Configure and Start RAGFlow
+
+```bash
+cd ragflow/docker
+
+# Configure to use Elasticsearch (not Infinity on ARM Macs)
+sed -i.bak 's/^DOC_ENGINE=.*/DOC_ENGINE=elasticsearch/' .env
+
+# Reduce memory for macOS compatibility
+sed -i.bak 's/^MEM_LIMIT=.*/MEM_LIMIT=4294967296/' .env
+
+# Start RAGFlow with Elasticsearch profile
+docker compose -f docker-compose-macos.yml --profile elasticsearch up -d
+```
+
+#### Wait for Services to Initialize
+
+```bash
+# Wait 2-3 minutes for all services to start
+docker ps --format "table {{.Names}}\t{{.Status}}"
+```
+
+You should see:
+- `docker-ragflow-1` - Up
+- `docker-es01-1` - Up (healthy)
+- `docker-mysql-1` - Up (healthy)
+- `docker-redis-1` - Up (healthy)
+- `docker-minio-1` - Up (healthy)
+
+#### Access RAGFlow UI
+
+Open your browser to: **http://localhost:80**
+
+1. Click **"Sign up"** to create an account
+2. Complete the initial model setup:
+   - Select an **LLM** (e.g., GPT-4 if you have an OpenAI key)
+   - Select an **Embedding model** (e.g., text-embedding-3-small)
+3. Create a **Dataset** named "Spine Imaging Guidelines"
+4. (Optional) Upload spine imaging guideline PDFs
+
+#### Generate RAGFlow API Key
+
+1. Click your **profile icon** (top right)
+2. Go to **"Settings"** or **"System"**
+3. Find **"API Keys"** section
+4. Click **"Generate API Key"**
+5. **Copy the key** (format: `ragflow-xxxxxxxxxxxxxx`)
+
+### 3. Set Up Flask Proxy
+
+#### Install Python Dependencies
+
+```bash
+cd /path/to/spineai-demo
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+#### Create Proxy Start Script
+
+```bash
+cat > start_proxy.sh << 'EOF'
+#!/bin/bash
+cd /path/to/spineai-demo
+source venv/bin/activate
+export RAGFLOW_API_KEY="your-ragflow-api-key-here"
+export RAGFLOW_URL="http://localhost:9380/api/v1"
+python proxy.py
+EOF
+
+chmod +x start_proxy.sh
+```
+
+**Replace:**
+- `/path/to/spineai-demo` with your actual path
+- `your-ragflow-api-key-here` with your RAGFlow API key
+
+#### Start Flask Proxy
+
+```bash
+./start_proxy.sh
+```
+
+The proxy will start on **http://localhost:8000**
+
+#### Verify Proxy is Running
+
+```bash
+curl http://localhost:8000/health
+```
+
+Expected response:
+```json
+{
+  "status": "ok",
+  "service": "spineai-proxy",
+  "config": {
+    "ragflow_configured": true,
+    "ragflow_url": "http://localhost:9380/api/v1"
+  }
+}
+```
+
+### 4. Configure iOS App
+
+#### Open Project in Xcode
+
+```bash
+cd SpineAI
+open LLMonFHIR.xcodeproj
+```
+
+#### Build and Run
+
+1. Select a simulator (e.g., iPhone 16 Pro)
+2. Click **Run (▶️)** or press `Cmd+R`
+3. Wait for the app to build and launch
+
+#### Configure SpineAI Proxy
+
+In the running app:
+
+1. Tap **⚙️ Settings** (top right)
+2. Scroll to **"SpineAI RAG"** section
+3. Tap **"SpineAI Proxy Settings"**
+4. Enter Proxy URL: `http://localhost:8000`
+5. Tap **"Test Connection"**
+
+You should see: ✅ **"Connection Successful"**
+
+### 5. Test the System
+
+#### Test via Terminal
+
+```bash
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What are guidelines for lumbar spine imaging?"}'
+```
+
+#### Test via iOS App
+
+1. In the app, navigate to **Chat** or **Multiple Resources Chat**
+2. Ask a question like: *"What are the guidelines for spine imaging?"*
+3. The app will query through the Flask proxy to RAGFlow
+
+**Note:** If you haven't uploaded spine imaging documents to RAGFlow, it will respond with: *"The answer you are looking for is not found in the knowledge base!"* This confirms the system is working correctly.
+
+## 📚 Uploading Clinical Guidelines (Optional)
+
+To get real spine imaging recommendations:
+
+1. Open **RAGFlow UI** (http://localhost:80)
+2. Go to **Dataset** → **"Spine Imaging Guidelines"**
+3. Click **"Add file"** → **"Local files"**
+4. Upload spine imaging clinical guideline PDFs
+5. Click the **▶️ (play)** button to parse each file
+6. Wait for parsing to complete
+
+Now queries will return evidence-based answers with citations!
+
+## 🔧 Configuration Files
+
+### `proxy.py`
+Flask proxy server that forwards requests from the iOS app to RAGFlow.
+
+**Environment Variables:**
+- `RAGFLOW_API_KEY`: Your RAGFlow API key (required)
+- `RAGFLOW_URL`: RAGFlow API endpoint (default: `http://localhost:9380/api/v1`)
+- `GCS_BUCKET`: Google Cloud Storage bucket for chat results (optional)
+
+### `ragflow/docker/.env`
+RAGFlow Docker configuration.
+
+**Key Settings:**
+- `DOC_ENGINE=elasticsearch`: Vector database backend
+- `MEM_LIMIT=4294967296`: Memory limit (4GB for macOS)
+- `ES_PORT=9201`: Elasticsearch port
+- `SVR_HTTP_PORT=9380`: RAGFlow API port
+
+### `LLMonFHIR/SharedContext/StorageKeys.swift`
+iOS app configuration.
+
+**Default proxy URL:**
+```swift
+static let proxyURL = "http://localhost:8000"
+```
+
+## 🐛 Troubleshooting
+
+### RAGFlow Login Button Not Responding
+
+**Issue:** Sign-in button does nothing, no error message.
+
+**Cause:** Elasticsearch not healthy yet.
+
+**Solution:**
+```bash
+docker logs docker-ragflow-1 | grep -i "elasticsearch.*healthy"
+```
+
+Wait until you see: `Elasticsearch http://... is healthy.`
+
+### RAGFlow Exits with Code 137
+
+**Issue:** Elasticsearch keeps restarting with exit code 137.
+
+**Cause:** Out of memory on macOS.
+
+**Solution:** Reduce memory in `.env`:
+```bash
+MEM_LIMIT=4294967296  # 4GB instead of 8GB
+```
+
+### Flask Proxy "RAGFlow not configured"
+
+**Issue:** Health check shows `ragflow_configured: false`
+
+**Cause:** `RAGFLOW_API_KEY` environment variable not set.
+
+**Solution:** Make sure to export the API key before starting:
+```bash
+export RAGFLOW_API_KEY="ragflow-your-key-here"
+python proxy.py
+```
+
+### iOS App "Connection Failed"
+
+**Issue:** Test connection fails in SpineAI Proxy Settings.
+
+**Causes & Solutions:**
+
+1. **Flask proxy not running:**
+   ```bash
+   curl http://localhost:8000/health
+   ```
+   If fails, start proxy: `./start_proxy.sh`
+
+2. **Wrong URL in app:** Should be `http://localhost:8000` (not https, not 9380)
+
+3. **Simulator network issue:** Restart simulator
+
+### Build Errors in Xcode
+
+**SwiftLint Violations:**
+
+These should be fixed, but if you encounter new ones:
+```bash
+cd SpineAI
+swiftlint autocorrect
+```
+
+**Swift Concurrency Errors:**
+
+Ensure all RAG-related files are marked as `@MainActor` where needed.
+
+## 🛑 Stopping Services
+
+### Stop All Services
+
+```bash
+# Stop Flask proxy
+pkill -f "proxy.py"
+
+# Stop RAGFlow
+cd ragflow/docker
+docker compose down
+
+# Stop Docker Desktop (optional)
+# Click Docker icon in menu bar → Quit Docker Desktop
+```
+
+### Restart Services
+
+```bash
+# Start Docker Desktop
+open -a Docker
+
+# Wait for Docker to start, then:
+cd ragflow/docker
+docker compose -f docker-compose-macos.yml up -d ragflow mysql redis minio
+
+# Start Flask proxy
+cd /path/to/spineai-demo
+./start_proxy.sh
+```
+
+## 📊 System Status Check
+
+Run this command to check all services:
+
+```bash
+echo "=== Docker Services ===" && \
+docker ps --format "table {{.Names}}\t{{.Status}}" | grep docker- && \
+echo -e "\n=== Flask Proxy ===" && \
+curl -s http://localhost:8000/health | python3 -m json.tool && \
+echo -e "\n=== RAGFlow UI ===" && \
+curl -s http://localhost:80 | grep -o "<title>.*</title>"
+```
+
+## 📖 API Documentation
+
+### Flask Proxy Endpoints
+
+#### `GET /health`
+Check proxy health and configuration status.
+
+#### `POST /query`
+Send a question to RAGFlow.
+
+**Request:**
+```json
+{
+  "question": "What are guidelines for spine imaging?",
+  "conversation_id": "optional-session-id"
+}
+```
+
+**Response:**
+```json
+{
+  "code": 0,
+  "data": {
+    "answer": "Based on clinical guidelines...",
+    "reference": {
+      "chunks": [...]
+    },
+    "session_id": "abc123..."
+  }
+}
+```
+
+#### `POST /upload-url`
+Generate signed URL for uploading chat results to Google Cloud Storage.
+
+### RAGFlow API
+
+Full API documentation: http://localhost:80/api-docs
+
+## 🔐 Security Notes
+
+- **Local Development Only:** This setup is for local development/demo purposes
+- **API Keys:** Never commit API keys to version control
+- **Production:** For production deployment, use proper authentication, HTTPS, and secure key management
+- **Health Data:** The iOS app processes health records; review OpenAI's data usage policies
+
+## 📄 Additional Documentation
+
+- [White Paper](../SpineAI_Final_Paper.md) - Technical details and architecture
+- [Presentation Slides](../PRESENTATION_SLIDES.md) - Project overview
+- [Original README](README.md) - Base LLMonFHIR app documentation
+
+## 🤝 Contributing
+
+When making changes:
+
+1. Ensure all build errors are fixed
+2. Run SwiftLint: `swiftlint`
+3. Test the full integration
+4. Update this SETUP.md if configuration changes
+
+## 📝 License
+
+This project builds on the LLM on FHIR application and uses the MIT license.
+
+---
+
+**Last Updated:** December 6, 2025  
+**Tested On:** macOS 14.5, Docker 28.0.4, Xcode 15.0
+

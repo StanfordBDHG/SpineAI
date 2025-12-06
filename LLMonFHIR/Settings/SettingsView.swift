@@ -56,6 +56,7 @@ struct SettingsView: View {
         ManagedNavigationStack(didComplete: self.$didComplete, path: self.path) {
             List {
                 llmSettings
+                spineAISettings
                 speechSettings
                 resourcesLimitSettings
                 resourcesSettings
@@ -145,6 +146,16 @@ struct SettingsView: View {
             NavigationButton("SETTINGS_LLM_SOURCE") {
                 path.append(
                     customView: LLMSourceSelection()
+                )
+            }
+        }
+    }
+    
+    private var spineAISettings: some View {
+        Section("SpineAI RAG") {
+            NavigationButton("SpineAI Proxy Settings") {
+                path.append(
+                    customView: SpineAIProxySettingsView()
                 )
             }
         }

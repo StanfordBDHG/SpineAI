@@ -13,6 +13,9 @@
     "A fog node must be configured in your local network. Please consult the LLMonFHIR docs for setup instructions." : {
 
     },
+    "About SpineAI RAG" : {
+
+    },
     "Allergies" : {
 
     },
@@ -23,6 +26,9 @@
 
     },
     "Checkmark" : {
+
+    },
+    "Cloud storage not configured" : {
 
     },
     "Computation is performed on so-called fog nodes, running directly inside your own network." : {
@@ -55,6 +61,12 @@
           }
         }
       }
+    },
+    "Connection Failed" : {
+
+    },
+    "Connection Successful" : {
+
     },
     "Could not create FHIR Summary" : {
       "localizations" : {
@@ -673,6 +685,9 @@
           }
         }
       }
+    },
+    "Enter the URL of your SpineAI RAG proxy server (e.g., https://proxy.spineai.stanford.edu)" : {
+
     },
     "FHIR_RESOURCES_EMPTY_SEARCH_MESSAGE" : {
       "localizations" : {
@@ -1599,6 +1614,12 @@
         }
       }
     },
+    "Proxy URL" : {
+
+    },
+    "RAGFlow not configured" : {
+
+    },
     "Random" : {
 
     },
@@ -2155,6 +2176,12 @@
     "Share Survey Results" : {
 
     },
+    "SpineAI Proxy" : {
+
+    },
+    "SpineAI RAG Proxy" : {
+
+    },
     "Start Client Setup" : {
 
     },
@@ -2226,6 +2253,9 @@
     "Temperature" : {
 
     },
+    "Test Connection" : {
+
+    },
     "The medical record does not include any FHIR resources for the search term %@." : {
       "localizations" : {
         "de" : {
@@ -2259,6 +2289,9 @@
           }
         }
       }
+    },
+    "The SpineAI proxy connects to RAGFlow for evidence-based spine imaging guidance." : {
+
     },
     "This is the summary of the requested %@:\n\n%@" : {
       "localizations" : {

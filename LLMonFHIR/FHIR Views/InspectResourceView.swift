@@ -11,6 +11,7 @@ import SpeziLLM
 import SpeziViews
 import SwiftUI
 
+@MainActor
 struct InspectResourceView: View {
     @Environment(FHIRResourceInterpreter.self) var fhirResourceInterpreter
     @Environment(FHIRResourceSummary.self) var fhirResourceSummary
@@ -20,7 +21,10 @@ struct InspectResourceView: View {
     @State private var summary: FHIRResourceSummary.Summary?
     @State private var interpretation: String?
     
-    var resource: FHIRResource
+    let resource: FHIRResource
+    private var sendableResource: SendableFHIRResource {
+        SendableFHIRResource(resource: resource)
+    }
     
     
     var body: some View {
@@ -68,8 +72,11 @@ struct InspectResourceView: View {
                 }
             }
         }
-        .task {
-            summary = await fhirResourceSummary.cachedSummary(forResource: resource)
+        .onAppear { [weak fhirResourceSummary, weak fhirResourceInterpreter, resource] in
+            guard let fhirResourceSummary else { return }
+            Task { @MainActor in
+                summary = await fhirResourceSummary.cachedSummary(forResource: resource)
+            }
         }
     }
     
@@ -98,8 +105,11 @@ struct InspectResourceView: View {
                 }
             }
         }
-        .task {
-            interpretation = await fhirResourceInterpreter.cachedInterpretation(forResource: resource)
+        .onAppear { [weak fhirResourceInterpreter, resource] in
+            guard let fhirResourceInterpreter else { return }
+            Task { @MainActor in
+                interpretation = await fhirResourceInterpreter.cachedInterpretation(forResource: resource)
+            }
         }
     }
     
@@ -114,10 +124,11 @@ struct InspectResourceView: View {
     
     private func loadSummary(forceReload: Bool = false) {
         loadingSummary = .processing
+        let resource = sendableResource
             
-        Task {
+        Task { @MainActor in
             do {
-                try await fhirResourceSummary.summarize(resource: SendableFHIRResource(resource: resource), forceReload: forceReload)
+                try await fhirResourceSummary.summarize(resource: resource, forceReload: forceReload)
                 loadingSummary = .idle
             } catch let error as any LLMError {
                 loadingSummary = .error(error)
@@ -129,10 +140,11 @@ struct InspectResourceView: View {
     
     private func interpret(forceReload: Bool = false) {
         interpreting = .processing
+        let resource = sendableResource
         
-        Task {
+        Task { @MainActor in
             do {
-                try await fhirResourceInterpreter.interpret(resource: SendableFHIRResource(resource: resource), forceReload: forceReload)
+                try await fhirResourceInterpreter.interpret(resource: resource, forceReload: forceReload)
                 interpreting = .idle
             } catch let error as any LLMError {
                 interpreting = .error(error)
