@@ -78,6 +78,9 @@ You can learn more about the Spezi standards-based software architecture in the 
 
 You can build and run the application using [Xcode](https://developer.apple.com/xcode/) by opening up the **LLMonFHIR.xcodeproj**.
 
+> [!NOTE]
+> **SpineAI RAG Integration:** This project includes integration with RAGFlow for evidence-based spine imaging guidance. See [SETUP.md](SETUP.md) for complete setup instructions including RAGFlow and Flask proxy configuration.
+
 
 ## Network-local privacy-focused Fog LLM Mode
 

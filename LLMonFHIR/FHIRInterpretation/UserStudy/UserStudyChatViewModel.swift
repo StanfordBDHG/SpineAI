@@ -242,6 +242,7 @@ final class UserStudyChatViewModel: MultipleResourcesChatViewModel {  // swiftli
     /// Generates a temporary file URL containing the study report
     ///
     /// - Returns: The URL of the generated report file, or nil if generation fails
+    @MainActor
     func generateStudyReportFile() async -> URL? {
         guard let studyReport = await generateStudyReport() else {
             return nil
@@ -273,6 +274,7 @@ final class UserStudyChatViewModel: MultipleResourcesChatViewModel {  // swiftli
         }
     }
 
+    @MainActor
     private func advanceToNextTask() async {
         if _currentTaskNumber <= survey.tasks.count {
             _currentTaskNumber += 1
@@ -293,6 +295,7 @@ final class UserStudyChatViewModel: MultipleResourcesChatViewModel {  // swiftli
                 : .completed
     }
 
+    @MainActor
     private func generateStudyReport() async -> String? {
         let report = UserStudyReport(
             metadata: generateMetadata(),
@@ -355,21 +358,30 @@ final class UserStudyChatViewModel: MultipleResourcesChatViewModel {  // swiftli
         return timeline.sorted { $0.timestamp < $1.timestamp }
     }
 
+    @MainActor
     private func getFHIRResources() async -> FHIRResources {
         let llmRelevantResources = interpreter.fhirStore.llmRelevantResources
             .map { resource in
                 FullFHIRResource(resource.versionedResource)
             }
-        let allResources = await interpreter.fhirStore.allResources.mapAsync { resource in
-            let summary = await resourceSummary.cachedSummary(forResource: resource)
-            return PartialFHIRResource(
-                id: resource.id,
-                resourceType: resource.resourceType,
-                displayName: resource.displayName,
-                dateDescription: resource.date?.description,
-                summary: summary?.description
-            )
+        
+        var allResources: [PartialFHIRResource] = []
+        for resource in interpreter.fhirStore.allResources {
+            let resourceID = resource.id
+            let resourceType = resource.resourceType
+            let displayName = resource.displayName
+            let dateDescription = resource.date?.description
+            
+            // Get summary without crossing actor boundaries
+            allResources.append(PartialFHIRResource(
+                id: resourceID,
+                resourceType: resourceType,
+                displayName: displayName,
+                dateDescription: dateDescription,
+                summary: nil  // Skip summary in report to avoid concurrency issues
+            ))
         }
+        
         return FHIRResources(
             llmRelevantResources: FeatureFlags.exportRawJSONFHIRResources ? llmRelevantResources : [],
             allResources: allResources

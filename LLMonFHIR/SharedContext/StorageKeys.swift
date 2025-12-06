@@ -20,6 +20,7 @@ enum StorageKeys {
         fileprivate static let openAIModelTemperature = 0.0
         static let llmSource = LLMSource.openai
         static let fogModel = LLMFogParameters.FogModelType.llama3_1_8B
+        static let proxyURL = "http://localhost:8000"  // SpineAI RAG proxy URL
     }
     
     
@@ -56,6 +57,14 @@ enum StorageKeys {
         return max(0.0, UserDefaults().double(forKey: StorageKeys.openAIModelTemperature))
     }
     
+    static var currentProxyURL: String {
+        guard let proxyURL = UserDefaults().string(forKey: StorageKeys.proxyURL) else {
+            return StorageKeys.Defaults.proxyURL
+        }
+        
+        return proxyURL
+    }
+    
     
     // MARK: - Onboarding
     /// A `Bool` flag indicating of the onboarding was completed.
@@ -88,4 +97,6 @@ enum StorageKeys {
     /// The value should correspond to the registered model name available on the fog node.
     /// LLMonFHIR uses this name to resolve and load the correct model.
     static let fogModel = "settings.fogModel"
+    /// SpineAI RAG proxy server URL
+    static let proxyURL = "settings.spineai.proxyURL"
 }
