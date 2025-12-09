@@ -16,51 +16,61 @@ struct SpineAIProxySettingsView: View {
     
     var body: some View {
         Form {
-            Section {
-                TextField("Proxy URL", text: $proxyURL)
-                    .textContentType(.URL)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-            } header: {
-                Text("SpineAI RAG Proxy")
-            } footer: {
-                Text("Enter the URL of your SpineAI RAG proxy server (e.g., https://proxy.spineai.stanford.edu)")
-            }
-            
-            Section {
-                Button {
-                    Task {
-                        await testConnection()
-                    }
-                } label: {
-                    HStack {
-                        Text("Test Connection")
-                        Spacer()
-                        if isTestingConnection {
-                            ProgressView()
-                        }
-                    }
-                }
-                .disabled(isTestingConnection || proxyURL.isEmpty)
-                
-                if let status = connectionStatus {
-                    ConnectionStatusRow(status: status)
-                }
-            }
-            
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("About SpineAI RAG")
-                        .font(.headline)
-                    Text("The SpineAI proxy connects to RAGFlow to provide evidence-based spine imaging guidance from clinical guidelines.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
+            proxySection
+            testSection
+            aboutSection
         }
         .navigationTitle("SpineAI Proxy")
         .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private var proxySection: some View {
+        Section {
+            TextField("Proxy URL", text: $proxyURL)
+                .textContentType(.URL)
+                .keyboardType(.URL)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+        } header: {
+            Text("SpineAI RAG Proxy")
+        } footer: {
+            Text("Enter the URL of your SpineAI RAG proxy server (e.g., https://proxy.spineai.stanford.edu)")
+        }
+    }
+    
+    private var testSection: some View {
+        Section {
+            Button {
+                Task {
+                    await testConnection()
+                }
+            } label: {
+                HStack {
+                    Text("Test Connection")
+                    Spacer()
+                    if isTestingConnection {
+                        ProgressView()
+                    }
+                }
+            }
+            .disabled(isTestingConnection || proxyURL.isEmpty)
+            
+            if let status = connectionStatus {
+                ConnectionStatusRow(status: status)
+            }
+        }
+    }
+    
+    private var aboutSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("About SpineAI RAG")
+                    .font(.headline)
+                Text("The SpineAI proxy connects to RAGFlow to provide evidence-based spine imaging guidance from clinical guidelines.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
     
     @MainActor
