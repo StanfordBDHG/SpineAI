@@ -959,6 +959,7 @@
       }
     },
     "FHIR_RESOURCES_VIEW_NO_RESOURCES" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

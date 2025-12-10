@@ -16,18 +16,20 @@ struct FHIRResourcesInstructionsView: View {
     
     
     var body: some View {
-        if fhirStore.allResources.isEmpty {
-            VStack(alignment: .center) {
-                Image(systemName: "doc.text.magnifyingglass")
-                    .accessibilityHidden(true)
-                    .font(.system(size: 90))
-                    .foregroundColor(.accentColor)
-                    .padding(.vertical, 8)
-                Text("FHIR_RESOURCES_VIEW_NO_RESOURCES")
-                    .frame(maxWidth: .infinity)
-                    .multilineTextAlignment(.leading)
-            }
-        } else if onboardingInstructions {
+        // Commented out for SpineAI - no need to show "No health records" message
+        // if fhirStore.allResources.isEmpty {
+        //     VStack(alignment: .center) {
+        //         Image(systemName: "doc.text.magnifyingglass")
+        //             .accessibilityHidden(true)
+        //             .font(.system(size: 90))
+        //             .foregroundColor(.accentColor)
+        //             .padding(.vertical, 8)
+        //         Text("FHIR_RESOURCES_VIEW_NO_RESOURCES")
+        //             .frame(maxWidth: .infinity)
+        //             .multilineTextAlignment(.leading)
+        //     }
+        // } else 
+        if onboardingInstructions {
             VStack(alignment: .center) {
                 HStack {
                     Spacer()

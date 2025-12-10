@@ -26,7 +26,7 @@ struct HomeView: View {
                 .sheet(isPresented: $showMultipleResourcesChat) {
                     MultipleResourcesChatView(
                         interpreter: interpreter,
-                        navigationTitle: "LLM on FHIR"
+                        navigationTitle: "SpineAI"
                     )
                 }
         }

@@ -19,8 +19,10 @@ struct MultipleResourcesChatView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: MultipleResourcesChatViewModel
+    @State private var hasShownGreeting = false
 
     @AppStorage(StorageKeys.enableTextToSpeech) private var textToSpeech = StorageKeys.currentEnableTextToSpeech
+    @AppStorage(StorageKeys.spineAIEnabled) private var spineAIEnabled = StorageKeys.Defaults.spineAIEnabled
 
 
     var body: some View {
@@ -45,13 +47,34 @@ struct MultipleResourcesChatView: View {
                 .speak(viewModel.llmSession.context.chat, muted: !textToSpeech)
                 .speechToolbarButton(muted: !$textToSpeech)
                 .viewStateAlert(state: viewModel.llmSession.state)
-                .onChange(of: viewModel.llmSession.context, initial: true) {
-                    Task {
-                        _ = await viewModel.generateAssistantResponse()
+                .onChange(of: viewModel.llmSession.context, initial: false) {
+                    // Only generate response for user messages, not greeting
+                    if viewModel.llmSession.context.last?.role == .user {
+                        Task {
+                            _ = await viewModel.generateAssistantResponse()
+                        }
                     }
                 }
         }
             .animation(.easeInOut(duration: 0.4), value: viewModel.isProcessing)
+            .onAppear {
+                if spineAIEnabled && !hasShownGreeting && viewModel.llmSession.context.chat.isEmpty {
+                    // Add SpineAI greeting message
+                    let greetingMessage = """
+                    Hi! I'm SpineAI, your spine care guidance assistant. I can help you understand:
+                    
+                    • Spine conditions and diagnoses
+                    • Treatment options (conservative, interventional, surgical)
+                    • Recovery timelines and expectations
+                    • When to seek medical care
+                    
+                    What questions do you have about spine health?
+                    """
+                    viewModel.llmSession.context.append(assistantOutput: greetingMessage)
+                    viewModel.llmSession.context.completeAssistantStreaming()
+                    hasShownGreeting = true
+                }
+            }
     }
 
     @MainActor @ToolbarContentBuilder private var toolbarContent: some ToolbarContent {
