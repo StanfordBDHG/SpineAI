@@ -131,15 +131,21 @@ MEM_LIMIT=4294967296
 
 ### 3.4 Start RAGFlow Services
 
-Copy and paste this command:
+First, pull the pre-built images (this prevents build errors):
 
 ```bash
-docker compose -f docker-compose-macos.yml up -d ragflow mysql redis minio
+docker compose -f docker-compose-macos.yml pull ragflow mysql redis minio
 ```
 
-This will take 5-10 minutes as Docker downloads and starts all services.
+This will take 5-10 minutes as Docker downloads the images.
 
-You'll see lots of text scrolling - this is normal. Wait until you see "Started" messages and the command prompt returns.
+Then start the services:
+
+```bash
+docker compose -f docker-compose-macos.yml up -d --no-build ragflow mysql redis minio
+```
+
+Wait until you see "Started" messages and the command prompt returns.
 
 ### 3.5 Verify Services Are Running
 
@@ -484,7 +490,7 @@ When you want to use SpineAI again:
 Open Terminal:
 ```bash
 cd ~/Downloads/ragflow/docker
-docker compose -f docker-compose-macos.yml up -d ragflow mysql redis minio
+docker compose -f docker-compose-macos.yml up -d --no-build ragflow mysql redis minio
 ```
 Wait 2-3 minutes for services to start.
 
