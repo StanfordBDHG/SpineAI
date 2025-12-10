@@ -137,7 +137,10 @@ chmod +x start_proxy.sh
 
 ### 4.3 Start the Proxy
 
+Make sure you're in the SpineAI folder, then run:
+
 ```bash
+cd ~/Downloads/SpineAI
 ./start_proxy.sh
 ```
 
