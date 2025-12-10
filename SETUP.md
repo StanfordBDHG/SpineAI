@@ -242,8 +242,9 @@ This is the AI that will answer questions.
    - Check the box next to "Spine Guidelines"
 5. Click "Save" or "Create"
 
-IMPORTANT: Note the Chat ID
-- After creating the assistant, you'll see a Chat ID (a long string of letters and numbers)
+IMPORTANT: Get the Chat ID
+- After saving the assistant, click the "Embed into webpage" button (usually in the assistant list)
+- A dialog will appear showing the Chat ID (a long string of letters and numbers)
 - COPY THIS CHAT ID - you'll need it in Step 5.3
 - It looks like: 444442f6d58a11f084153604d8716792
 
