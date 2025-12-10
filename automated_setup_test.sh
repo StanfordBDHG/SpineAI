@@ -102,8 +102,11 @@ grep "DOC_ENGINE\|MEM_LIMIT" .env
 # 3.4 Start RAGFlow Services
 echo ""
 echo "Step 3.4: Start RAGFlow Services"
-echo "This will take 5-10 minutes..."
-docker compose -f docker-compose-macos.yml up -d ragflow mysql redis minio
+echo "Pulling pre-built images first (this may take 5-10 minutes)..."
+docker compose -f docker-compose-macos.yml pull ragflow mysql redis minio
+
+echo "Starting services..."
+docker compose -f docker-compose-macos.yml up -d --no-build ragflow mysql redis minio
 
 echo "Waiting for services to start..."
 sleep 180  # Wait 3 minutes
