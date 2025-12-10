@@ -192,10 +192,9 @@ echo "Step 5.4: Create Startup Script"
 cat > ~/Downloads/SpineAI2/start_proxy.sh << 'EOF'
 #!/bin/bash
 cd ~/Downloads/SpineAI2
-source venv/bin/activate
 export RAGFLOW_API_KEY="PASTE_YOUR_API_KEY_HERE"
 export RAGFLOW_URL="http://localhost:9380/api/v1"
-python proxy.py
+./venv/bin/python proxy.py
 EOF
 
 chmod +x ~/Downloads/SpineAI2/start_proxy.sh

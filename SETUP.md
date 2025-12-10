@@ -325,10 +325,9 @@ Copy and paste this command:
 cat > ~/Downloads/SpineAI/start_proxy.sh << 'EOF'
 #!/bin/bash
 cd ~/Downloads/SpineAI
-source venv/bin/activate
 export RAGFLOW_API_KEY="PASTE_YOUR_API_KEY_HERE"
 export RAGFLOW_URL="http://localhost:9380/api/v1"
-python proxy.py
+./venv/bin/python proxy.py
 EOF
 ```
 
