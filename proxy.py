@@ -96,7 +96,30 @@ def query():
         result = response.json()
         
         logger.info(f"RAGFlow response received")
-        return jsonify(result)
+        
+        # Transform RAGFlow response to iOS app format
+        if result.get("code") == 0 and "data" in result:
+            data = result["data"]
+            transformed = {
+                "answer": data.get("answer", ""),
+                "conversationId": data.get("session_id", ""),
+                "references": []
+            }
+            
+            # Transform references if present
+            if "reference" in data and "chunks" in data["reference"]:
+                for chunk in data["reference"]["chunks"]:
+                    ref = {
+                        "content": chunk.get("content_with_weight", chunk.get("content_ltks", "")),
+                        "source": chunk.get("doc_name"),
+                        "page": chunk.get("page_num")
+                    }
+                    transformed["references"].append(ref)
+            
+            return jsonify(transformed)
+        else:
+            # Error case
+            return jsonify({"error": result.get("message", "Unknown error")}), 500
     
     except requests.exceptions.Timeout:
         logger.error("RAGFlow request timeout")
