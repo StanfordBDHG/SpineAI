@@ -91,9 +91,3 @@ This setup provides low latency, strong performance, and improved privacy, since
 For instructions on running a minimal Docker-based fog node on Linux or macOS, see [FogNode/README.md](FogNode/README.md).
 
 
-## Contributors & License
-
-This project is based on [Spezi](https://github.com/StanfordSpezi/Spezi) framework and builds on top of the [Stanford Spezi Template Application](https://github.com/StanfordSpezi/SpeziTemplateApplication) provided using the MIT license.
-You can find a list of contributors in the `CONTRIBUTORS.md` file.
-
-The LLM on FHIR project, Spezi Template Application, and the Spezi framework are licensed under the MIT license.

@@ -107,7 +107,16 @@ class MultipleResourcesChatViewModel {
         }
 
         processingState = .processingSystemPrompts
+        
+        // Check if SpineAI RAG is enabled
+        let spineAIEnabled = UserDefaults.standard.bool(forKey: StorageKeys.spineAIEnabled)
+        
+        if spineAIEnabled {
+            // Use SpineAI RAG for response
+            return await generateSpineAIResponse()
+        }
 
+        // Use default LLM interpreter
         guard let response = await interpreter.generateAssistantResponse() else {
             return nil
         }
@@ -116,5 +125,33 @@ class MultipleResourcesChatViewModel {
         processingState = await processingState.calculateNewProcessingState(basedOn: llmSession)
 
         return response
+    }
+    
+    /// Generates a response using SpineAI RAG system
+    private func generateSpineAIResponse() async -> LLMContextEntity? {
+        // Get the last user message
+        guard let lastUserMessage = llmSession.context.last(where: { $0.role == .user }) else {
+            return nil
+        }
+        
+        let question = lastUserMessage.content
+        
+        do {
+            // Query SpineAI RAGFlow
+            let ragResponse = try await queryRAGFlow(question: question)
+            
+            // Add the response to the chat context
+            llmSession.context.append(assistantOutput: ragResponse)
+            llmSession.context.completeAssistantStreaming()
+            
+            return llmSession.context.last
+        } catch {
+            // If RAG fails, add error message to chat
+            let errorMessage = "SpineAI is temporarily unavailable. Error: \(error.localizedDescription)"
+            llmSession.context.append(assistantOutput: errorMessage)
+            llmSession.context.completeAssistantStreaming()
+            
+            return llmSession.context.last
+        }
     }
 }

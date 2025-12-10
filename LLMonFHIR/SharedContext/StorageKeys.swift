@@ -21,6 +21,7 @@ enum StorageKeys {
         static let llmSource = LLMSource.openai
         static let fogModel = LLMFogParameters.FogModelType.llama3_1_8B
         static let proxyURL = "http://localhost:8000"  // SpineAI RAG proxy URL
+        static let spineAIEnabled = false
     }
     
     
@@ -99,4 +100,6 @@ enum StorageKeys {
     static let fogModel = "settings.fogModel"
     /// SpineAI RAG proxy server URL
     static let proxyURL = "settings.spineai.proxyURL"
+    /// Enable/disable SpineAI RAG for chat responses
+    static let spineAIEnabled = "settings.spineai.enabled"
 }

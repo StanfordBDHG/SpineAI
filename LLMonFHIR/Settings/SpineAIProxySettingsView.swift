@@ -11,6 +11,7 @@ import SwiftUI
 /// Settings view for configuring the SpineAI RAG proxy connection
 struct SpineAIProxySettingsView: View {
     @AppStorage(StorageKeys.proxyURL) private var proxyURL = StorageKeys.Defaults.proxyURL
+    @AppStorage(StorageKeys.spineAIEnabled) private var spineAIEnabled = StorageKeys.Defaults.spineAIEnabled
     @State private var isTestingConnection = false
     @State private var connectionStatus: ConnectionStatus?
     
@@ -26,15 +27,18 @@ struct SpineAIProxySettingsView: View {
     
     private var proxySection: some View {
         Section {
+            Toggle("Enable SpineAI RAG", isOn: $spineAIEnabled)
+            
             TextField("Proxy URL", text: $proxyURL)
                 .textContentType(.URL)
                 .keyboardType(.URL)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
+                .disabled(!spineAIEnabled)
         } header: {
             Text("SpineAI RAG Proxy")
         } footer: {
-            Text("Enter the URL of your SpineAI RAG proxy server (e.g., https://proxy.spineai.stanford.edu)")
+            Text("When enabled, chat responses will use SpineAI's RAG system to provide evidence-based spine care guidance from clinical guidelines.")
         }
     }
     

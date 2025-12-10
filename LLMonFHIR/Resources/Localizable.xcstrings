@@ -2179,6 +2179,12 @@
     "SpineAI Proxy" : {
 
     },
+    "SpineAI Proxy Settings" : {
+
+    },
+    "SpineAI RAG" : {
+
+    },
     "SpineAI RAG Proxy" : {
 
     },
@@ -2290,7 +2296,7 @@
         }
       }
     },
-    "The SpineAI proxy connects to RAGFlow for evidence-based spine imaging guidance." : {
+    "The SpineAI proxy connects to RAGFlow to provide evidence-based spine imaging guidance from clinical guidelines." : {
 
     },
     "This is the summary of the requested %@:\n\n%@" : {
