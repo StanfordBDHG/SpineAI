@@ -18,12 +18,25 @@ Complete setup instructions for running the SpineAI system on your Mac.
 ## Step 2: Download the Project
 
 1. Open Terminal (found in Applications > Utilities)
-2. Navigate to where you want to download the project
-3. Clone the repository:
+2. Navigate to where you want to download the project (e.g., Downloads):
    ```bash
-   git clone <repository-url>
-   cd spineai-demo
+   cd ~/Downloads
    ```
+
+3. Clone the SpineAI repository:
+   ```bash
+   git clone https://github.com/StanfordBDHG/SpineAI.git
+   git checkout spineai-integration
+   ```
+
+4. Clone RAGFlow (required for the AI engine):
+   ```bash
+   git clone https://github.com/infiniflow/ragflow.git
+   ```
+
+You should now have two folders:
+- `~/Downloads/SpineAI` (the iOS app)
+- `~/Downloads/ragflow` (the RAG engine)
 
 ## Step 3: Start RAGFlow
 
@@ -32,7 +45,7 @@ RAGFlow is the AI engine that provides spine imaging guidance.
 ### 3.1 Configure RAGFlow
 
 ```bash
-cd ragflow/docker
+cd ~/Downloads/ragflow/docker
 ```
 
 Run these commands to configure RAGFlow for your Mac:
@@ -91,21 +104,26 @@ The proxy connects your iOS app to RAGFlow.
 
 ### 4.1 Install Python Dependencies
 
+The Flask proxy needs Python and some libraries. Set it up:
+
 ```bash
-cd /path/to/spineai-demo
+cd ~/Downloads/SpineAI
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install flask requests google-cloud-storage
 ```
+
+**Note:** If you get errors about `google-cloud-storage`, that's okay - it's only needed for optional cloud storage features.
 
 ### 4.2 Create Startup Script
 
 Create a file called `start_proxy.sh`:
 
 ```bash
+cd ~/Downloads/SpineAI
 cat > start_proxy.sh << 'EOF'
 #!/bin/bash
-cd /path/to/spineai-demo
+cd ~/Downloads/SpineAI
 source venv/bin/activate
 export RAGFLOW_API_KEY="PASTE_YOUR_API_KEY_HERE"
 export RAGFLOW_URL="http://localhost:9380/api/v1"
@@ -115,9 +133,7 @@ EOF
 chmod +x start_proxy.sh
 ```
 
-**Important:** 
-- Replace `/path/to/spineai-demo` with your actual path
-- Replace `PASTE_YOUR_API_KEY_HERE` with the API key you copied
+**Important:** Replace `PASTE_YOUR_API_KEY_HERE` with the API key you copied from RAGFlow (it starts with `ragflow-`)
 
 ### 4.3 Start the Proxy
 
@@ -137,7 +153,7 @@ You should see:
 ### 5.1 Open Xcode
 
 ```bash
-cd SpineAI
+cd ~/Downloads/SpineAI
 open LLMonFHIR.xcodeproj
 ```
 
@@ -189,7 +205,7 @@ In the terminal where it's running, press `Ctrl+C`
 
 ### Stop RAGFlow
 ```bash
-cd ragflow/docker
+cd ~/Downloads/ragflow/docker
 docker compose down
 ```
 
@@ -203,12 +219,12 @@ When you want to use it again:
 1. **Start Docker Desktop** (from Applications)
 2. **Start RAGFlow:**
    ```bash
-   cd ragflow/docker
+   cd ~/Downloads/ragflow/docker
    docker compose -f docker-compose-macos.yml up -d ragflow mysql redis minio
    ```
 3. **Start Flask Proxy:**
    ```bash
-   cd /path/to/spineai-demo
+   cd ~/Downloads/SpineAI
    ./start_proxy.sh
    ```
 4. **Run the iOS app** in Xcode
