@@ -14,6 +14,7 @@ import SwiftUI
 struct ResourceView: View {
     @Environment(LLMonFHIRStandard.self) private var standard
     @Environment(FHIRStore.self) private var fhirStore
+    @AppStorage(StorageKeys.spineAIEnabled) private var spineAIEnabled = StorageKeys.Defaults.spineAIEnabled
     @Binding var showMultipleResourcesChat: Bool
     
     
@@ -57,12 +58,12 @@ struct ResourceView: View {
             showMultipleResourcesChat.toggle()
         } label: {
             HStack(spacing: 8) {
-                if standard.waitingState.isWaiting {
+                if !spineAIEnabled && standard.waitingState.isWaiting {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .controlSize(.regular)
                 }
-                Text(standard.waitingState.isWaiting ? "Loading Resources" : "Chat with all Resources")
+                Text(buttonText)
             }
                 .font(.headline)
                 .fontWeight(.semibold)
@@ -71,7 +72,17 @@ struct ResourceView: View {
         }
             .controlSize(.extraLarge)
             .buttonBorderShape(.capsule)
-            .disabled(standard.waitingState.isWaiting)
+            .disabled(!spineAIEnabled && standard.waitingState.isWaiting)
             .animation(.default, value: standard.waitingState.isWaiting)
+    }
+    
+    private var buttonText: String {
+        if spineAIEnabled {
+            return "Chat with SpineAI"
+        } else if standard.waitingState.isWaiting {
+            return "Loading Resources"
+        } else {
+            return "Chat with all Resources"
+        }
     }
 }
