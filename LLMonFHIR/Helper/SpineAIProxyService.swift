@@ -8,6 +8,72 @@
 
 import Foundation
 
+// MARK: - Errors
+
+enum ProxyError: LocalizedError {
+    case invalidResponse
+    case serverError(statusCode: Int)
+    case uploadFailed(statusCode: Int)
+    case networkError(Error)
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidResponse:
+            return "Invalid response from proxy server"
+        case .serverError(let statusCode):
+            return "Server error: \(statusCode)"
+        case .uploadFailed(let statusCode):
+            return "Upload failed: \(statusCode)"
+        case .networkError(let error):
+            return "Network error: \(error.localizedDescription)"
+        }
+    }
+}
+
+// MARK: - Response Models
+
+/// Response from RAGFlow query
+struct RAGFlowResponse: Codable {
+    struct Reference: Codable {
+        let content: String
+        let source: String?
+        let page: Int?
+    }
+    
+    let answer: String
+    let conversationId: String?
+    let references: [Reference]
+}
+
+/// Response from upload URL request
+struct UploadURLResponse: Codable {
+    let uploadUrl: String
+    let filename: String
+    let bucket: String
+    let expiresIn: Int
+    
+    var url: URL? {
+        URL(string: uploadUrl)
+    }
+}
+
+/// Health check response
+struct HealthResponse: Codable {
+    struct ConfigStatus: Codable {
+        let ragflowConfigured: Bool
+        let ragflowUrl: String
+        let gcsConfigured: Bool
+        let gcsBucket: String?
+    }
+    
+    let status: String
+    let service: String
+    let version: String
+    let config: ConfigStatus
+}
+
+// MARK: - Service
+
 /// Service to communicate with the SpineAI RAG proxy server
 ///
 /// This service handles:
@@ -148,70 +214,3 @@ class SpineAIProxyService {
         return try decoder.decode(HealthResponse.self, from: data)
     }
 }
-
-
-// MARK: - Response Models
-
-/// Response from RAGFlow query
-struct RAGFlowResponse: Codable {
-    let answer: String
-    let conversationId: String?
-    let references: [Reference]?
-    
-    struct Reference: Codable {
-        let content: String
-        let source: String?
-        let page: Int?
-    }
-}
-
-/// Response from upload URL request
-struct UploadURLResponse: Codable {
-    let uploadUrl: String
-    let filename: String
-    let bucket: String
-    let expiresIn: Int
-    
-    var url: URL? {
-        URL(string: uploadUrl)
-    }
-}
-
-/// Health check response
-struct HealthResponse: Codable {
-    let status: String
-    let service: String
-    let version: String
-    let config: ConfigStatus
-    
-    struct ConfigStatus: Codable {
-        let ragflowConfigured: Bool
-        let ragflowUrl: String
-        let gcsConfigured: Bool
-        let gcsBucket: String?
-    }
-}
-
-
-// MARK: - Errors
-
-enum ProxyError: LocalizedError {
-    case invalidResponse
-    case serverError(statusCode: Int)
-    case uploadFailed(statusCode: Int)
-    case networkError(Error)
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidResponse:
-            return "Invalid response from proxy server"
-        case .serverError(let statusCode):
-            return "Server error: \(statusCode)"
-        case .uploadFailed(let statusCode):
-            return "Upload failed: \(statusCode)"
-        case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
-        }
-    }
-}
-

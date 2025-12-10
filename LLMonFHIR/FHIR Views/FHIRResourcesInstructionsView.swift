@@ -29,45 +29,48 @@ struct FHIRResourcesInstructionsView: View {
         //             .multilineTextAlignment(.leading)
         //     }
         // } else 
-        if onboardingInstructions {
-            VStack(alignment: .center) {
-                HStack {
-                    Spacer()
-                    if #available(iOS 26.0, *) {
-                        dismissButton
-                        #if swift(>=6.2)
-                            .buttonStyle(.glass)
-                        #endif
-                    } else {
-                        dismissButton
-                    }
-                }
-                    .padding(.horizontal, -8)
-                    .padding(.bottom, -32)
-                Image(systemName: "hand.wave.fill")
-                    .accessibilityHidden(true)
-                    .font(.system(size: 75))
-                    .foregroundColor(.accentColor)
-                    .padding(.bottom, 8)
-                Text("FHIR_RESOURCES_VIEW_INSTRUCTION")
-                    .frame(maxWidth: .infinity)
-                    .multilineTextAlignment(.leading)
-            }
-        } else {
-            EmptyView()
-        }
+        // Commented out for SpineAI - welcome message not needed
+        // if onboardingInstructions {
+        //     VStack(alignment: .center) {
+        //         HStack {
+        //             Spacer()
+        //             if #available(iOS 26.0, *) {
+        //                 dismissButton
+        //                 #if swift(>=6.2)
+        //                     .buttonStyle(.glass)
+        //                 #endif
+        //             } else {
+        //                 dismissButton
+        //             }
+        //         }
+        //             .padding(.horizontal, -8)
+        //             .padding(.bottom, -32)
+        //         Image(systemName: "hand.wave.fill")
+        //             .accessibilityHidden(true)
+        //             .font(.system(size: 75))
+        //             .foregroundColor(.accentColor)
+        //             .padding(.bottom, 8)
+        //         Text("FHIR_RESOURCES_VIEW_INSTRUCTION")
+        //             .frame(maxWidth: .infinity)
+        //             .multilineTextAlignment(.leading)
+        //     }
+        // } else {
+        //     EmptyView()
+        // }
+        EmptyView()
     }
     
-    private var dismissButton: some View {
-        Button {
-            withAnimation {
-                onboardingInstructions = false
-            }
-        } label: {
-            Image(systemName: "xmark")
-                .accessibilityLabel("Dismiss onboarding hint")
-        }
-            .buttonBorderShape(.circle)
-            .foregroundColor(.secondary)
-    }
+    // Commented out - not needed for SpineAI
+    // private var dismissButton: some View {
+    //     Button {
+    //         withAnimation {
+    //             onboardingInstructions = false
+    //         }
+    //     } label: {
+    //         Image(systemName: "xmark")
+    //             .accessibilityLabel("Dismiss onboarding hint")
+    //     }
+    //         .buttonBorderShape(.circle)
+    //         .foregroundColor(.secondary)
+    // }
 }

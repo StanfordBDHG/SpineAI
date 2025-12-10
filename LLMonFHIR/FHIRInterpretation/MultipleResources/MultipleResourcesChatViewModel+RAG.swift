@@ -28,9 +28,9 @@ extension MultipleResourcesChatViewModel {
         // Format response with citations
         var formattedResponse = response.answer
         
-        if let references = response.references, !references.isEmpty {
+        if !response.references.isEmpty {
             formattedResponse += "\n\n**References:**\n"
-            for (index, reference) in references.enumerated() {
+            for (index, reference) in response.references.enumerated() {
                 formattedResponse += "\n[\(index + 1)] \(reference.content)"
                 if let source = reference.source {
                     formattedResponse += " (Source: \(source)"
@@ -45,4 +45,3 @@ extension MultipleResourcesChatViewModel {
         return formattedResponse
     }
 }
-

@@ -59,7 +59,9 @@ struct FHIRResourceSummaryView: View {
         }
         .viewStateAlert(state: $viewState)
         .onAppear { [weak fhirResourceSummary, resource] in
-            guard let fhirResourceSummary else { return }
+            guard let fhirResourceSummary else {
+                return
+            }
             Task { @MainActor in
             summary = await fhirResourceSummary.cachedSummary(forResource: resource)
             }

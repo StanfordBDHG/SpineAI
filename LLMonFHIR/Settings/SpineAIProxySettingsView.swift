@@ -8,6 +8,51 @@
 
 import SwiftUI
 
+// MARK: - Supporting Types
+
+enum ConnectionStatus {
+    case success(ragflowConfigured: Bool, gcsConfigured: Bool)
+    case failure(String)
+}
+
+struct ConnectionStatusRow: View {
+    let status: ConnectionStatus
+    
+    var body: some View {
+        switch status {
+        case let .success(ragflowConfigured, gcsConfigured):
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Connection Successful", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                
+                if !ragflowConfigured {
+                    Label("RAGFlow not configured", systemImage: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+                
+                if !gcsConfigured {
+                    Label("Cloud storage not configured", systemImage: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+            }
+            
+        case let .failure(message):
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Connection Failed", systemImage: "xmark.circle.fill")
+                    .foregroundStyle(.red)
+                
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+// MARK: - Main View
+
 /// Settings view for configuring the SpineAI RAG proxy connection
 struct SpineAIProxySettingsView: View {
     @AppStorage(StorageKeys.proxyURL) private var proxyURL = StorageKeys.Defaults.proxyURL
@@ -102,54 +147,8 @@ struct SpineAIProxySettingsView: View {
     }
 }
 
-// MARK: - Connection Status
-
-enum ConnectionStatus {
-    case success(ragflowConfigured: Bool, gcsConfigured: Bool)
-    case failure(String)
-}
-
-// MARK: - Connection Status Row
-
-struct ConnectionStatusRow: View {
-    let status: ConnectionStatus
-    
-    var body: some View {
-        switch status {
-        case .success(let ragflowConfigured, let gcsConfigured):
-            VStack(alignment: .leading, spacing: 4) {
-                Label("Connection Successful", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                
-                if !ragflowConfigured {
-                    Label("RAGFlow not configured", systemImage: "exclamationmark.triangle")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
-                
-                if !gcsConfigured {
-                    Label("Cloud storage not configured", systemImage: "exclamationmark.triangle")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
-            }
-            
-        case .failure(let message):
-            VStack(alignment: .leading, spacing: 4) {
-                Label("Connection Failed", systemImage: "xmark.circle.fill")
-                    .foregroundStyle(.red)
-                
-                Text(message)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-}
-
 #Preview {
     NavigationStack {
         SpineAIProxySettingsView()
     }
 }
-
