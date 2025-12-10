@@ -38,16 +38,18 @@ echo ""
 # 2. Remove downloaded folders
 echo "2. Removing downloaded folders..."
 
-if [ -d ~/Downloads/SpineAI ]; then
+if [ -d ~/Downloads/SpineAI2 ]; then
     # Save the cleanup script itself before deleting
-    if [ -f ~/Downloads/SpineAI/cleanup_for_fresh_test.sh ]; then
-        cp ~/Downloads/SpineAI/cleanup_for_fresh_test.sh ~/Downloads/cleanup_for_fresh_test_backup.sh
+    if [ -f ~/Downloads/SpineAI2/cleanup_for_fresh_test.sh ]; then
+        cp ~/Downloads/SpineAI2/cleanup_for_fresh_test.sh ~/Downloads/cleanup_for_fresh_test_backup.sh
     fi
-    rm -rf ~/Downloads/SpineAI
-    echo "   ✓ Removed ~/Downloads/SpineAI"
+    rm -rf ~/Downloads/SpineAI2
+    echo "   ✓ Removed ~/Downloads/SpineAI2"
 else
-    echo "   ℹ SpineAI folder not found (skipping)"
+    echo "   ℹ SpineAI2 folder not found (skipping)"
 fi
+
+echo "   ℹ Preserving ~/Downloads/SpineAI (contains important data)"
 
 if [ -d ~/Downloads/ragflow ]; then
     rm -rf ~/Downloads/ragflow

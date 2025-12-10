@@ -51,14 +51,14 @@ cd ~/Downloads
 # 2.3 Download SpineAI (the iOS app)
 echo ""
 echo "Step 2.3: Download SpineAI"
-if [ -d "SpineAI" ]; then
-    echo "SpineAI folder already exists. Removing it..."
-    rm -rf SpineAI
+if [ -d "SpineAI2" ]; then
+    echo "SpineAI2 folder already exists. Removing it..."
+    rm -rf SpineAI2
 fi
 
-git clone https://github.com/StanfordBDHG/SpineAI.git
+git clone https://github.com/StanfordBDHG/SpineAI.git SpineAI2
 
-cd SpineAI
+cd SpineAI2
 git checkout spineai-integration
 cd ..
 
@@ -75,7 +75,7 @@ git clone https://github.com/infiniflow/ragflow.git
 # Verify folders exist
 echo ""
 echo "Verifying folders..."
-ls ~/Downloads | grep -E "SpineAI|ragflow"
+ls ~/Downloads | grep -E "SpineAI2|ragflow"
 
 # ===========================================
 # STEP 3: Set Up RAGFlow (AI Engine)
@@ -165,7 +165,7 @@ show_step "STEP 5: Set Up the Flask Proxy"
 
 # 5.2 Install Python Dependencies
 echo "Step 5.2: Install Python Dependencies"
-cd ~/Downloads/SpineAI
+cd ~/Downloads/SpineAI2
 
 python3 -m venv venv
 
@@ -184,16 +184,16 @@ echo "✓ Updated proxy.py with Chat ID: $CHAT_ID"
 # 5.4 Create Startup Script
 echo ""
 echo "Step 5.4: Create Startup Script"
-cat > ~/Downloads/SpineAI/start_proxy.sh << 'EOF'
+cat > ~/Downloads/SpineAI2/start_proxy.sh << 'EOF'
 #!/bin/bash
-cd ~/Downloads/SpineAI
+cd ~/Downloads/SpineAI2
 source venv/bin/activate
 export RAGFLOW_API_KEY="PASTE_YOUR_API_KEY_HERE"
 export RAGFLOW_URL="http://localhost:9380/api/v1"
 python proxy.py
 EOF
 
-chmod +x ~/Downloads/SpineAI/start_proxy.sh
+chmod +x ~/Downloads/SpineAI2/start_proxy.sh
 
 # 5.5 Edit the Startup Script with Your API Key
 echo ""
@@ -226,7 +226,7 @@ show_step "STEP 6: Run the iOS App"
 
 # 6.1 Open Xcode
 echo "Step 6.1: Open Xcode"
-cd ~/Downloads/SpineAI
+cd ~/Downloads/SpineAI2
 open LLMonFHIR.xcodeproj
 
 echo ""
@@ -282,7 +282,7 @@ echo "All automated steps from SETUP.md have been executed successfully!"
 echo ""
 echo "Summary:"
 echo "  ✓ Docker running"
-echo "  ✓ Projects downloaded (SpineAI, ragflow)"
+echo "  ✓ Projects downloaded (SpineAI2, ragflow)"
 echo "  ✓ RAGFlow configured and running"
 echo "  ✓ Flask proxy configured and running (PID: $PROXY_PID)"
 echo "  ✓ Xcode project opened"
