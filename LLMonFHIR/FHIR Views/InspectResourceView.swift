@@ -75,7 +75,7 @@ struct InspectResourceView: View {
         .onAppear { [weak fhirResourceSummary, weak fhirResourceInterpreter, resource] in
             guard let fhirResourceSummary else { return }
             Task { @MainActor in
-                summary = await fhirResourceSummary.cachedSummary(forResource: resource)
+            summary = await fhirResourceSummary.cachedSummary(forResource: resource)
             }
         }
     }
@@ -108,7 +108,7 @@ struct InspectResourceView: View {
         .onAppear { [weak fhirResourceInterpreter, resource] in
             guard let fhirResourceInterpreter else { return }
             Task { @MainActor in
-                interpretation = await fhirResourceInterpreter.cachedInterpretation(forResource: resource)
+            interpretation = await fhirResourceInterpreter.cachedInterpretation(forResource: resource)
             }
         }
     }

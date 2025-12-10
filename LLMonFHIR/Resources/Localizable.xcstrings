@@ -22,9 +22,6 @@
     "Balanced" : {
 
     },
-    "Chat with all Resources" : {
-
-    },
     "Checkmark" : {
 
     },
@@ -655,6 +652,9 @@
     "Documents" : {
 
     },
+    "Enable SpineAI RAG" : {
+
+    },
     "Enable Usability Study" : {
 
     },
@@ -685,9 +685,6 @@
           }
         }
       }
-    },
-    "Enter the URL of your SpineAI RAG proxy server (e.g., https://proxy.spineai.stanford.edu)" : {
-
     },
     "FHIR_RESOURCES_EMPTY_SEARCH_MESSAGE" : {
       "localizations" : {
@@ -1342,9 +1339,6 @@
           }
         }
       }
-    },
-    "Loading Resources" : {
-
     },
     "LOADING_HEALTH_RECORDS" : {
       "localizations" : {
@@ -2774,6 +2768,9 @@
           }
         }
       }
+    },
+    "When enabled, chat responses will use SpineAI's RAG system to provide evidence-based spine care guidance from clinical guidelines." : {
+
     },
     "Yes" : {
 
